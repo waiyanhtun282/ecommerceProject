@@ -13,14 +13,16 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  Product.create({
+  req.user.createProduct({
     title: title,
-    description: description,
-    imageUrl: imageUrl,
     price: price,
+    imageUrl: imageUrl,
+    description: description,
   })
-    .then((result) => {
-      console.log(result);
+  .then((result) => {
+      // console.log(result);
+      console.log("Created Product");
+      res.redirect("/admin/products");
     })
     .catch((err) => {
       console.log(err);
@@ -45,9 +47,7 @@ exports.getEditProduct = (req, res, next) => {
         product: product,
       });
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((err) => console.log(err));
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -60,17 +60,15 @@ exports.postEditProduct = (req, res, next) => {
     .then((product) => {
       product.title = updatedTitle;
       product.price = updatedPrice;
+      product.description = updatedDesc;
       product.imageUrl = updatedImageUrl;
-      product.updatedDesc = updatedDesc;
       return product.save();
     })
     .then((result) => {
       console.log("UPDATED PRODUCT!");
       res.redirect("/admin/products");
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((err) => console.log(err));
 };
 
 exports.getProducts = (req, res, next) => {
@@ -82,13 +80,19 @@ exports.getProducts = (req, res, next) => {
         path: "/admin/products",
       });
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((err) => console.log(err));
 };
 
 exports.postDeleteProduct = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.deleteById(prodId);
-  res.redirect("/admin/products");
+  Product.findByPk(prodId)
+    .then((product) => {
+      return product.destroy();
+    })
+    .then((result) => {
+      console.log("DESTROY PRODUCTS");
+
+      res.redirect("/admin/products");
+    })
+    .catch((err) => console.log(err));
 };
