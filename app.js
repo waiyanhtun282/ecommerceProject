@@ -4,11 +4,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 
 const errorController = require("./controllers/error");
-// for databse or sequelize
 const sequelize = require("./util/database");
 const Product = require("./models/product");
 const User = require("./models/user");
 const Cart = require("./models/cart");
+const CartItem = require("./models/cart-item");
+const Order = require("./models/order");
+const OrderItem = require("./models/order-item");
 
 const app = express();
 
@@ -21,12 +23,13 @@ const shopRoutes = require("./routes/shop");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// for user middlewar
 app.use((req, res, next) => {
-  User.findByPk(1).then((user) => {
-    req.user = user;
-    next();
-  });
+  User.findByPk(1)
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
 });
 
 app.use("/admin", adminRoutes);
@@ -36,20 +39,32 @@ app.use(errorController.get404);
 
 Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 User.hasMany(Product);
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
+Order.belongsTo(User);
+User.hasMany(Order);
+Order.belongsToMany(Product, { through: CartItem });
+
 sequelize
-  .sync({ force: true })
-  // .sync()
+  // .sync({ force: true })
+  .sync()
   .then((result) => {
     return User.findByPk(1);
-    // console.log(result);autoIncrement
+    // console.log(result);
   })
   .then((user) => {
     if (!user) {
-      return User.create({ name: "Leo", email: "leo@gmail.com" });
+      return User.create({ name: "Max", email: "test@test.com" });
     }
     return user;
   })
-  .then((result) => {
+  .then((user) => {
+    // console.log(user);
+    return user.createCart();
+  })
+  .then((cart) => {
     app.listen(3000);
   })
   .catch((err) => {
