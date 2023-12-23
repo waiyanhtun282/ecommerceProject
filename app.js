@@ -39,6 +39,7 @@ mongoose
   )
   .then(() => {
     User.findOne().then((user) => {
+      // console.log(user);
       if (!user) {
         const user = new User({
           name: "Leo",
