@@ -64,6 +64,7 @@ exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
   Product.findById(prodId)
     .then((product) => {
+      // console.log(product);
       return req.user.addToCart(product);
     })
     .then(() => {
@@ -104,7 +105,7 @@ exports.getOrders = (req, res, next) => {
 exports.postOrder = (req, res, next) => {
   req.user
     .populate("cart.items.productId")
-    .execPopulate()
+    // .execPopulate()
     .then((user) => {
       // map
       console.log(user.cart.items);
