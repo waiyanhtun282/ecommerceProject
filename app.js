@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
-  User.findById("65847463df6d5086db740284")
+  User.findById("65b11f628f06c7233831643b")
     .then((user) => {
       req.user = user;
       next();
@@ -35,7 +35,8 @@ app.use(errorController.get404);
 
 mongoose
   .connect(
-    "mongodb+srv://root:root@cluster0.fwlvfnp.mongodb.net/Shop?retryWrites=true&w=majority"
+    "mongodb+srv://waiyanhtun:2001228@cluster0.63clnsv.mongodb.net/?retryWrites=true&w=majority"
+    // "mongodb+srv://root:root@cluster0.fwlvfnp.mongodb.net/Shop?retryWrites=true&w=majority"
   )
   .then(() => {
     User.findOne().then((user) => {
